@@ -46,6 +46,55 @@ namespace GymSystem.Controllers
             return View(plans);
         }
 
+        // details page 
+        // plan/details/id
+
+        public async Task<IActionResult> Details(int id , CancellationToken ct)
+        {
+            var plan = await planService.GetPlanByIdAsync(id, ct);
+            if (plan == null)
+            {
+                               return RedirectToAction(nameof(Index));
+            }
+            return View(plan);
+        }
+
+
+        // edit
+        // paln/details/edit/id
+
+        [HttpGet]
+
+        public async Task<IActionResult> Edit(int id , CancellationToken ct)
+        {
+            var plan = await planService.GetPlanByIdAsync(id, ct);
+            if (plan == null)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+            return View(plan);
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         // Details action method to display the details of a specific plan
         // Get baseUrl/Plan/Details/{id}
         //public async Task<IActionResult >Details(int id , CancellationToken ct)

@@ -72,10 +72,10 @@ namespace GymSystem.PL.Controllers
                 return View(nameof(Create), model);
 
             var result = await memberService.CreateMemberAsync(model, ct);
-            if(result)
+            if(result.succes)
                 TempData["SuccessMessage"] = "Member created successfully.";
             else
-             TempData["ErrorMessage"] = "Failed to create member.";
+             TempData["ErrorMessage"] = result.error;
             return RedirectToAction(nameof(Index));
 
             

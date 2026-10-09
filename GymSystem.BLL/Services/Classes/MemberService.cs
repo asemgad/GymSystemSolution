@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using GymManagement.BLL.Common;
 using GymSystem.BLL.Services.Interfaces;
 using GymSystem.BLL.ViewModels.MemberViewModels;
 using GymSystem.DAL.Date.Models;
@@ -30,10 +31,11 @@ namespace GymSystem.BLL.Services.Classes
         //    , IGenericRepository<Plan> planRepository
         //    , IGenericRepository<HealthRecord> healthRecordRepository,
         //    IGenericRepository<Booking> bookingRepository)
+        //public MemberService(IUnitOfWork unitOfWork , IMapper mapper)
         public MemberService(IUnitOfWork unitOfWork , IMapper mapper)
         {
-            _unitOfWork=unitOfWork;
-            _mapper=mapper;
+            //_unitOfWork=unitOfWork;
+            //_mapper=mapper;
             //_memberRepository = memberRepository;
             //_memberShipRepository = membershipRepository;
             //_planRepository = planRepository;
@@ -65,64 +67,76 @@ namespace GymSystem.BLL.Services.Classes
             //    });
             //}
 
-            var memberViewModels = members.Select(member => new MemberViewModel
-            {
-                Id = member.Id,
-                Photo = member.Photo,
-                Name = member.Name,
-                Email = member.Email,
-                Phone = member.Phone,
-                Gender = member.Gender.ToString()
-            }).ToList();
+            //var memberViewModels = members.Select(member => new MemberViewModel
+            //{
+            //    Id = member.Id,
+            //    Photo = member.Photo,
+            //    Name = member.Name,
+            //    Email = member.Email,
+            //    Phone = member.Phone,
+            //    Gender = member.Gender.ToString()
+            //}).ToList();
+
+            var memberViewModels = _mapper.Map<IEnumerable<Member>, IEnumerable<MemberViewModel>>(members);
 
             return memberViewModels;
         }
 
-        public async Task<bool> CreateMemberAsync(CreateMemberViewModel model, CancellationToken ct = default)
+
+
+
+        public async Task<Result> CreateMemberAsync(CreateMemberViewModel model, CancellationToken ct = default)
         {
             // check email 
-            var emailExists = await _unitOfWork.GetGenericRepository<Member>().AnyAsync(x => x.Email == model.Email, ct );
+            var emailExists = await _unitOfWork.GetGenericRepository<Member>().AnyAsync(x => x.Email == model.Email, ct);
             // check phone
             var phoneExists = await _unitOfWork.GetGenericRepository<Member>().AnyAsync(x => x.Phone == model.Phone, ct);
             // if email or phone exists return false
             if (emailExists || phoneExists)
             {
-                return false;
+                return Result.Fail("Email or phone number already exists.");
             }
 
-            var member = new Member()
-            {
-                Email = model.Email,
-                Name = model.Name,
-                Phone = model.Phone,
-                Gender = model.Gender,
-                DateOfBirth = model.DateOfBirth,
-               Adress = new  Adress()
-                {
-                   Street = model.Street,
-                  BuildingNumber = model.BuildingNumber,
-                   City = model.City,
-                    
-                },
-               HealthRecord = new HealthRecord()
-                {
-                    BloodType = model.healthRecordViewModel.BloodType,
-                    Weight = model.healthRecordViewModel.Weight,
-                    Height = model.healthRecordViewModel.Height,
-                    Note = model.healthRecordViewModel.Note
-               }
+            //var member = new Member()
+            //{
+            //    Email = model.Email,
+            //    Name = model.Name,
+            //    Phone = model.Phone,
+            //    Gender = model.Gender,
+            //    DateOfBirth = model.DateOfBirth,
+            //    Adress = new Adress()
+            //    {
+            //        Street = model.Street,
+            //        BuildingNumber = model.BuildingNumber,
+            //        City = model.City,
+
+            //    },
+            //    HealthRecord = new HealthRecord()
+            //    {
+            //        BloodType = model.healthRecordViewModel.BloodType,
+            //        Weight = model.healthRecordViewModel.Weight,
+            //        Height = model.healthRecordViewModel.Height,
+            //        Note = model.healthRecordViewModel.Note
+            //    }
 
 
 
-            };
- 
-          // var result = await _memberRepository.Add(member); // Add the member to the repository and retuns the rows affected to knwo if anything is added
-          _unitOfWork.GetGenericRepository<Member>().Add(member);// Locally and at the end we will do it to database
-            var result = await  _unitOfWork.SaveChanges(ct);
-            return result > 0;
+            //};
+
+
+            var member = _mapper.Map<Member>(model); // Map the model to the member entity
+            // isteasd of  var memvber.Map<CreateMemberViewModel , Member>()
+
+
+            // var result = await _memberRepository.Add(member); // Add the member to the repository and retuns the rows affected to knwo if anything is added
+            _unitOfWork.GetGenericRepository<Member>().Add(member);// Locally and at the end we will do it to database
+            var result = await _unitOfWork.SaveChanges(ct);
+            return result > 0 ? Result.Ok() : Result.Fail("Failed to create member.");
 
         }
 
+
+        
         public async Task<MemberViewModel?> GetMemberByIdAsync(int id, CancellationToken ct = default)
         {
             var member = await _unitOfWork.GetGenericRepository<Member>().GetByIdAsync(id, ct);
@@ -164,15 +178,17 @@ namespace GymSystem.BLL.Services.Classes
             {
                 return null; 
             }
-            var model = new HealthRecordViewModel()
-            {
-                Height = record.Height,
-                Weight = record.Weight,
-                BloodType = record.BloodType,
-                Note = record.Note
+            //var model = new HealthRecordViewModel()
+            //{
+            //    Height = record.Height,
+            //    Weight = record.Weight,
+            //    BloodType = record.BloodType,
+            //    Note = record.Note
 
-            };
-            return model;
+            //};
+
+           
+            return _mapper.Map<HealthRecordViewModel>(record);
         }
 
         public async Task<MemberToUpdateViewModel?> GetMemberToUpdateAsync(int memberId, CancellationToken ct = default)
@@ -213,13 +229,15 @@ namespace GymSystem.BLL.Services.Classes
                 return false;
             }
 
-           
-            member.Email = model.Email;
-            member.Phone = model.Phone;
-            member.Adress.BuildingNumber = model.BuildingNumber;
-            member.Adress.City = model.City;
-            member.Adress.Street = model.Street;
-            member.UpdatedAt = DateTime.Now;
+
+            //member.Email = model.Email;
+            //member.Phone = model.Phone;
+            //member.Adress.BuildingNumber = model.BuildingNumber;
+            //member.Adress.City = model.City;
+            //member.Adress.Street = model.Street;
+            //member.UpdatedAt = DateTime.Now;
+
+            _mapper.Map(model, member);
             //var result = await _memberRepository.UpdateAsync(member, ct); befoere unit of work 
            _unitOfWork.GetGenericRepository<Member>().Update(member);
             var result = await _unitOfWork.SaveChanges(ct);
@@ -245,5 +263,11 @@ namespace GymSystem.BLL.Services.Classes
             var result = await _unitOfWork.SaveChanges(ct);
             return result > 0;
         }
+
+    
+
+
+
+        }
     }
-}
+
