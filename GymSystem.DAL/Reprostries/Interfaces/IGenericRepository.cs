@@ -19,5 +19,7 @@ namespace GymSystem.DAL.Reprostries.Interfaces
         Task<bool> AnyAsync( Expression<Func<TEntity, bool>> predicate,CancellationToken ct = default);
 
         Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken ct = default);
+
+        Task<int> GetCountAsync(Expression<Func<TEntity, bool>> ? condition = null, CancellationToken ct = default);
     }
 }

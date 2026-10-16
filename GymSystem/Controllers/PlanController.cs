@@ -3,6 +3,7 @@ using GymSystem.DAL.Reprostries.Interfaces;
 using GymSystem.BLL.Services.Interfaces;
 using GymSystem.BLL.Services.Classes;
 using Microsoft.AspNetCore.Mvc;
+using GymSystem.BLL.ViewModels.PlanViewModels;
 //using Microsoft.EntityFrameworkCore;
 
 namespace GymSystem.Controllers
@@ -67,12 +68,35 @@ namespace GymSystem.Controllers
 
         public async Task<IActionResult> Edit(int id , CancellationToken ct)
         {
-            var plan = await planService.GetPlanByIdAsync(id, ct);
+            var plan = await planService.GetPlanToUpdate(id, ct);
             if (plan == null)
             {
                 return RedirectToAction(nameof(Index));
             }
             return View(plan);
+        }
+
+        [HttpPost]
+
+        public async Task<IActionResult> Edit(int id, UpdatePlanViewModel updatePlanViewModel, CancellationToken ct)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(updatePlanViewModel);
+            }
+            
+            var result = await planService.UpdatePlanAsync(id, updatePlanViewModel, ct);
+
+            if (result.succes)
+            {
+                TempData["SuccessMessage"] = "Plan updated successfully.";
+
+            }
+            else
+            {
+                TempData["ErrorMessage"] = result.error;
+            }
+            return RedirectToAction(nameof(Index));
         }
 
 

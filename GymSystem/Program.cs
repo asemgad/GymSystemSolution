@@ -26,6 +26,7 @@ namespace GymSystem
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<ISessionRepository, SessionRepository>();
             builder.Services.AddScoped<ISessionService, SessionService>();
+            builder.Services.AddScoped<IAnalytices, AnalyticsService>();
             builder.Services.AddAutoMapper(m => m.AddProfile(new MappingProfile()));
 
             /* That's the whole point of "killing new": move the responsibility of creating dependencies 

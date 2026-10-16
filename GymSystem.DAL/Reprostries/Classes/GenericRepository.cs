@@ -79,6 +79,18 @@ namespace GymSystem.DAL.Reprostries.Classes
             return query.FirstOrDefaultAsync(predicate, ct);
         }
 
+        public Task<int> GetCountAsync(Expression<Func<TEntity, bool>>? condition = null, CancellationToken ct = default)
+        {
+            if (condition != null)
+            {
+                return dbSet.CountAsync(condition, ct);
+            }
+            else
+            {
+                return dbSet.CountAsync(ct);
+            }
+        }
+
         //public Task<IEnumerable<TEntity>> GetAllAsync(bool tracking, CancellationToken cancellationToken = default)
         //{
         //    throw new NotImplementedException();

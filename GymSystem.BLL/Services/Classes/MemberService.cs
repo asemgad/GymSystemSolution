@@ -34,8 +34,8 @@ namespace GymSystem.BLL.Services.Classes
         //public MemberService(IUnitOfWork unitOfWork , IMapper mapper)
         public MemberService(IUnitOfWork unitOfWork , IMapper mapper)
         {
-            //_unitOfWork=unitOfWork;
-            //_mapper=mapper;
+            _unitOfWork=unitOfWork;
+            _mapper=mapper;
             //_memberRepository = memberRepository;
             //_memberShipRepository = membershipRepository;
             //_planRepository = planRepository;
@@ -46,7 +46,7 @@ namespace GymSystem.BLL.Services.Classes
         }
         public async Task<IEnumerable<MemberViewModel>> GetallAsync(CancellationToken ct = default)
         {
-            var members = await _unitOfWork.GetGenericRepository<Member>().GetAllAsync(tracking: false, cancellationToken: ct);
+            var members = await _unitOfWork.GetGenericRepository<Member>().GetAllAsync();
             if (!members.Any())
             {
                 //return Enumerable.Empty<MemberViewModel>();
